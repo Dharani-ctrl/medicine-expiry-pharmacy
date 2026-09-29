@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Record New Purchase - Pharmacy System{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('purchase.index') }}" class="text-decoration-none text-muted">
+        <i class="fas fa-arrow-left me-1"></i> Back to Purchases List
+    </a>
+    <h3 class="fw-bold mt-2">Record New Stock Purchase</h3>
+</div>
+
+<form method="POST" action="{{ url_for('purchase.new') }}" id="purchaseForm">
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-white py-3 border-0">
+            <h5 class="fw-bold mb-0 text-primary"><i class="fas fa-truck-loading me-2"></i> Supplier & Invoice Info</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Supplier <span class="text-danger">*</span></label>
+                    <select class="form-select" name="supplier_id" required>
+                        <option value="">Select Supplier</option>
+                        {% for sup in suppliers %}
+                        <option value="{{ sup.id }}">{{ sup.name }} ({{ sup.company_name or 'Supplier' }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Purchase Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" name="purchase_date" value="{{ today_date }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Payment Status</label>
+                    <select class="form-select" name="payment_status">
+                        <option value="Paid">Paid</option>
+                        <option value="Partial">Partial</option>
+                        <option value="Unpaid">Unpaid / Credit</option>
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label fw-bold">Notes / Invoice Reference</label>
+                    <input type="text" class="form-control" name="notes" placeholder="Vendor Invoice # or additional notes...">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Paid Amount (₹)</label>
+                    <input type="number" step="0.01" class="form-control" name="paid_amount" value="0.00">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Items Section -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center section-toolbar section-toolbar-compact">
+            <h5 class="fw-bold mb-0 text-primary"><i class="fas fa-boxes me-2"></i> Purchased Medicine Batches</h5>
+            <button type="button" class="section-toolbar-button btn btn-sm btn-outline-success fw-bold" id="addBatchRowBtn">
+                <i class="fas fa-plus me-1"></i> Add Medicine Row
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0" id="purchaseItemsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="min-width: 220px;">Medicine <span class="text-danger">*</span></th>
+                            <th style="width: 140px;">Batch No <span class="text-danger">*</span></th>
+                            <th style="width: 140px;">Mfg Date</th>
+                            <th style="width: 140px;">Expiry Date <span class="text-danger">*</span></th>
+                            <th style="width: 160px;">Manufacturer</th>
+                            <th style="width: 100px;">Qty <span class="text-danger">*</span></th>
+                            <th style="width: 120px;">Buy Price (₹)</th>
+                            <th style="width: 120px;">Sell Price (₹)</th>
+                            <th style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchaseItemsBody">
+                        <tr class="item-row">
+                            <td>
+                                <select class="form-select" name="medicine_id[]" required>
+                                    <option value="">Select Medicine</option>
+                                    {% for med in medicines %}
+                                    <option value="{{ med.id }}">{{ med.name }} ({{ med.unit }})</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td><input type="text" class="form-control" name="batch_no[]" placeholder="BCH-101" required></td>
+                            <td><input type="date" class="form-control" name="mfg_date[]"></td>
+                            <td><input type="date" class="form-control" name="expiry_date[]" required></td>
+                            <td><input type="text" class="form-control" name="manufacturer[]" placeholder="Company name"></td>
+                            <td><input type="number" class="form-control qty-input" name="quantity[]" min="1" value="10" required></td>
+                            <td><input type="number" step="0.01" class="form-control buy-price-input" name="purchase_price[]" value="5.00" required></td>
+                            <td><input type="number" step="0.01" class="form-control sell-price-input" name="selling_price[]" value="8.00" required></td>
+                            <td><button type="button" class="btn btn-sm btn-link text-danger remove-row-btn"><i class="fas fa-times fs-5"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-3 mb-5">
+        <a href="{{ url_for('purchase.index') }}" class="btn btn-outline-secondary px-4 py-2">Cancel</a>
+        <button type="submit" class="btn btn-primary fw-bold px-4 py-2">
+            <i class="fas fa-check-circle me-1"></i> Save & Record Purchase
+        </button>
+    </div>
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tableBody = document.getElementById('purchaseItemsBody');
+    const addBtn = document.getElementById('addBatchRowBtn');
+
+    addBtn.addEventListener('click', function() {
+        const firstRow = tableBody.querySelector('.item-row');
+        const newRow = firstRow.cloneNode(true);
+        
+        // Reset values
+        newRow.querySelectorAll('input').forEach(input => {
+            if (input.name.includes('quantity')) input.value = 10;
+            else if (input.name.includes('purchase_price')) input.value = '5.00';
+            else if (input.name.includes('selling_price')) input.value = '8.00';
+            else input.value = '';
+        });
+        newRow.querySelector('select').selectedIndex = 0;
+
+        tableBody.appendChild(newRow);
+        attachRemoveListener(newRow.querySelector('.remove-row-btn'));
+    });
+
+    function attachRemoveListener(btn) {
+        btn.addEventListener('click', function() {
+            const rows = tableBody.querySelectorAll('.item-row');
+            if (rows.length > 1) {
+                btn.closest('.item-row').remove();
+            } else {
+                alert('Purchase must have at least one medicine item row.');
+            }
+        });
+    }
+
+    tableBody.querySelectorAll('.remove-row-btn').forEach(attachRemoveListener);
+});
+</script>
+{% endblock %}

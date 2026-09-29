@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Sales History - Pharmacy System{% endblock %}
+
+{% block content %}
+<div class="section-toolbar d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Sales & Invoice History</h3>
+        <p class="text-muted mb-0">View generated customer bills and billing transactions.</p>
+    </div>
+    <a href="{{ url_for('sales.pos') }}" class="section-toolbar-button btn btn-primary fw-bold rounded-pill px-3 shadow-sm">
+        <i class="fas fa-plus me-1"></i> New POS Bill
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Invoice No</th>
+                        <th>Customer Name</th>
+                        <th>Phone</th>
+                        <th>Subtotal</th>
+                        <th>Tax</th>
+                        <th>Discount</th>
+                        <th>Grand Total</th>
+                        <th>Payment Method</th>
+                        <th>Sale Date</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales %}
+                    <tr>
+                        <td class="fw-bold text-primary">{{ sale.invoice_no }}</td>
+                        <td class="fw-bold text-dark">{{ sale.customer_name }}</td>
+                        <td class="text-muted">{{ sale.customer_phone or '-' }}</td>
+                        <td>₹{{ "%.2f"|format(sale.subtotal) }}</td>
+                        <td>₹{{ "%.2f"|format(sale.tax_amount) }}</td>
+                        <td>₹{{ "%.2f"|format(sale.discount_amount) }}</td>
+                        <td class="fw-bold text-success fs-6">₹{{ "%.0f"|format(sale.grand_total) }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ sale.payment_method }}</span></td>
+                        <td class="small text-muted">{{ sale.sale_date }}</td>
+                        <td class="text-end">
+                            <a href="{{ url_for('sales.invoice', sale_id=sale.id) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-print me-1"></i> Invoice
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center py-4 text-muted">No sales invoices recorded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Supplier Management - Pharmacy System{% endblock %}
+
+{% block content %}
+<div class="section-toolbar d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Supplier Management</h3>
+        <p class="text-muted mb-0">Manage pharmaceutical vendors, contact info, and purchase orders.</p>
+    </div>
+    <button class="section-toolbar-button btn btn-primary fw-bold rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+        <i class="fas fa-plus me-1"></i> Add Supplier
+    </button>
+</div>
+
+<!-- Suppliers Table -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Contact Person</th>
+                        <th>Company Name</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                        <th>Purchases</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sup in suppliers %}
+                    <tr>
+                        <td class="small text-muted">#{{ sup.id }}</td>
+                        <td class="fw-bold text-dark">{{ sup.name }}</td>
+                        <td class="fw-bold text-primary">{{ sup.company_name or '-' }}</td>
+                        <td>{{ sup.phone or '-' }}</td>
+                        <td>{{ sup.email or '-' }}</td>
+                        <td class="small text-muted" style="max-width: 200px;">{{ sup.address or '-' }}</td>
+                        <td><span class="badge bg-secondary-subtle text-secondary border">{{ sup.total_purchases }} Orders</span></td>
+                        <td>
+                            {% if sup.status == 'active' %}
+                                <span class="badge bg-success-subtle text-success border border-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary border">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ url_for('supplier.view', supplier_id=sup.id) }}" class="btn btn-sm btn-outline-info me-1" title="View History">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editSupplierModal{{ sup.id }}" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <form method="POST" action="{{ url_for('supplier.delete', supplier_id=sup.id) }}" class="d-inline" onsubmit="return confirm('Delete this supplier?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    <!-- Edit Modal -->
+                    <div class="modal fade" id="editSupplierModal{{ sup.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="POST" action="{{ url_for('supplier.edit', supplier_id=sup.id) }}">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title fw-bold">Edit Supplier</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Contact Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="name" value="{{ sup.name }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Company Name</label>
+                                            <input type="text" class="form-control" name="company_name" value="{{ sup.company_name or '' }}">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Phone Number</label>
+                                            <input type="text" class="form-control" name="phone" value="{{ sup.phone or '' }}">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Email Address</label>
+                                            <input type="email" class="form-control" name="email" value="{{ sup.email or '' }}">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Address</label>
+                                            <textarea class="form-control" name="address" rows="2">{{ sup.address or '' }}</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Registered Date</label>
+                                            <input type="date" class="form-control" name="registered_date" value="{{ sup.registered_date or '' }}">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Supplied Items</label>
+                                            <input type="text" class="form-control" name="supplied_items" value="{{ sup.supplied_items or '' }}" placeholder="e.g. Tablets, Syrups">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Status</label>
+                                            <select class="form-select" name="status">
+                                                <option value="active" {% if sup.status == 'active' %}selected{% endif %}>Active</option>
+                                                <option value="inactive" {% if sup.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary fw-bold">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">No suppliers added yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addSupplierModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('supplier.add') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Add Supplier</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Contact Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="name" placeholder="e.g. John Doe" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Company Name</label>
+                        <input type="text" class="form-control" name="company_name" placeholder="e.g. Apex Pharma Distributors">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Phone Number</label>
+                        <input type="text" class="form-control" name="phone" placeholder="e.g. +1 555-0192">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Email Address</label>
+                        <input type="email" class="form-control" name="email" placeholder="sales@supplier.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Address</label>
+                        <textarea class="form-control" name="address" rows="2" placeholder="Full business address..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Registered Date</label>
+                        <input type="date" class="form-control" name="registered_date">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Supplied Items</label>
+                        <input type="text" class="form-control" name="supplied_items" placeholder="e.g. Tablets, Syrups">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Status</label>
+                        <select class="form-select" name="status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold">Add Supplier</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

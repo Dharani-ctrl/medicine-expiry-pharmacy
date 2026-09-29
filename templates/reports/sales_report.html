@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Sales Report - Pharmacy System{% endblock %}
+
+{% block content %}
+<div class="section-toolbar d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Sales Report</h3>
+        <p class="text-muted mb-0">Detailed analysis of pharmacy revenue and customer invoices.</p>
+    </div>
+    <a href="{{ url_for('report.sales', start_date=start_date, end_date=end_date, export='csv') }}" class="section-toolbar-button btn btn-outline-success fw-bold rounded-pill">
+        <i class="fas fa-file-csv me-1"></i> Export CSV
+    </a>
+</div>
+
+<!-- Date Filter Form -->
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('report.sales') }}" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-bold small text-muted">Start Date</label>
+                <input type="date" class="form-control" name="start_date" value="{{ start_date }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold small text-muted">End Date</label>
+                <input type="date" class="form-control" name="end_date" value="{{ end_date }}">
+            </div>
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary fw-bold w-100">Apply Filter</button>
+                <a href="{{ url_for('report.sales') }}" class="btn btn-outline-secondary"><i class="fas fa-undo"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Summary Widgets -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card card-stat bg-white">
+            <div class="card-body">
+                <span class="text-muted small fw-bold text-uppercase">Total Revenue</span>
+                <h3 class="fw-bold text-success mb-0">₹{{ "%.2f"|format(data.total_revenue) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-stat bg-white">
+            <div class="card-body">
+                <span class="text-muted small fw-bold text-uppercase">Total Invoices</span>
+                <h3 class="fw-bold text-primary mb-0">{{ data.total_invoices }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-stat bg-white">
+            <div class="card-body">
+                <span class="text-muted small fw-bold text-uppercase">Average Invoice Value</span>
+                <h3 class="fw-bold text-info mb-0">₹{{ "%.2f"|format(data.avg_invoice) }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Table -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Invoice No</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Sale Date</th>
+                        <th>Grand Total</th>
+                        <th>Payment Method</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in data.sales %}
+                    <tr>
+                        <td class="fw-bold text-primary">{{ s.invoice_no }}</td>
+                        <td class="fw-bold">{{ s.customer_name }}</td>
+                        <td>{{ s.customer_phone or '-' }}</td>
+                        <td>{{ s.sale_date }}</td>
+                        <td class="fw-bold text-success">₹{{ "%.2f"|format(s.grand_total) }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ s.payment_method }}</span></td>
+                        <td class="text-end">
+                            <a href="{{ url_for('sales.invoice', sale_id=s.id) }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> View</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No sales data matching range.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

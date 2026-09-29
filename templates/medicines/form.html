@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if medicine %}Edit Medicine{% else %}Add New Medicine{% endif %} - Pharmacy System{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('medicine.index') }}" class="text-decoration-none text-muted">
+        <i class="fas fa-arrow-left me-1"></i> Back to Medicines List
+    </a>
+    <h3 class="fw-bold mt-2">{% if medicine %}Edit Medicine #{{ medicine.id }}{% else %}Add New Medicine{% endif %}</h3>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 col-lg-8">
+    <div class="card-body p-4">
+        <form method="POST" action="{% if medicine %}{{ url_for('medicine.edit', medicine_id=medicine.id) }}{% else %}{{ url_for('medicine.add') }}{% endif %}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Medicine Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="name" value="{{ medicine.name if medicine else '' }}" placeholder="e.g., Amoxicillin 500mg" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Generic Name</label>
+                    <input type="text" class="form-control" name="generic_name" value="{{ medicine.generic_name if medicine else '' }}" placeholder="e.g., Amoxicillin Trihydrate">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Category <span class="text-danger">*</span></label>
+                    <select class="form-select" name="category_id" required>
+                        <option value="">Select Category</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if medicine and medicine.category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Primary Supplier</label>
+                    <select class="form-select" name="supplier_id">
+                        <option value="">Select Supplier (Optional)</option>
+                        {% for sup in suppliers %}
+                        <option value="{{ sup.id }}" {% if medicine and medicine.supplier_id == sup.id %}selected{% endif %}>{{ sup.name }} ({{ sup.company_name }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Unit Type</label>
+                    <select class="form-select" name="unit">
+                        {% set units = ['Tablet', 'Capsule', 'Syrup Bottle', 'Injection Vial', 'Ointment Tube', 'Box', 'Strip', 'Sachet'] %}
+                        {% for u in units %}
+                        <option value="{{ u }}" {% if medicine and medicine.unit == u %}selected{% endif %}>{{ u }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Minimum Alert Stock Level</label>
+                    <input type="number" class="form-control" name="min_stock_level" value="{{ medicine.min_stock_level if medicine else 10 }}" min="1" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Status</label>
+                    <select class="form-select" name="status">
+                        <option value="active" {% if not medicine or medicine.status == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if medicine and medicine.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-bold">Description / Usage Notes</label>
+                    <textarea class="form-control" name="description" rows="3" placeholder="Additional details or medical usages...">{{ medicine.description if medicine else '' }}</textarea>
+                </div>
+
+                <div class="col-12 mt-4">
+                    <button type="submit" class="btn btn-primary fw-bold px-4 py-2">
+                        <i class="fas fa-save me-1"></i> {% if medicine %}Save Changes{% else %}Add Medicine{% endif %}
+                    </button>
+                    <a href="{{ url_for('medicine.index') }}" class="btn btn-outline-secondary ms-2 px-4 py-2">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

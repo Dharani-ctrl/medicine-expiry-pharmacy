@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Expiry Management - Pharmacy System{% endblock %}
+
+{% block content %}
+<div class="section-toolbar d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Medicine Expiry Monitoring</h3>
+        <p class="text-muted mb-0">Track expired medicines and upcoming batch expiration dates within 30, 60, and 90 days.</p>
+    </div>
+    <div class="section-toolbar-actions">
+        <a href="{{ url_for('return.new') }}" class="section-toolbar-button btn btn-outline-danger fw-bold rounded-pill">
+            <i class="fas fa-undo-alt me-1"></i> Return Expired Batches
+        </a>
+    </div>
+</div>
+
+<!-- Expiry Filter Pills -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <a href="{{ url_for('inventory.expiry', range='expired') }}" class="card border-0 shadow-sm text-decoration-none rounded-4 {% if selected_range == 'expired' %}border border-2 border-danger{% endif %}">
+            <div class="card-body text-center py-3">
+                <span class="badge bg-danger mb-2">Expired</span>
+                <h3 class="fw-bold text-danger mb-0">{{ counts.expired }}</h3>
+                <small class="text-muted">Already Expired</small>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <a href="{{ url_for('inventory.expiry', range='30') }}" class="card border-0 shadow-sm text-decoration-none rounded-4 {% if selected_range == '30' %}border border-2 border-warning{% endif %}">
+            <div class="card-body text-center py-3">
+                <span class="badge bg-warning text-dark mb-2">30 Days</span>
+                <h3 class="fw-bold text-warning mb-0">{{ counts.days_30 }}</h3>
+                <small class="text-muted">Expiring in 1-30 Days</small>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <a href="{{ url_for('inventory.expiry', range='60') }}" class="card border-0 shadow-sm text-decoration-none rounded-4 {% if selected_range == '60' %}border border-2 border-info{% endif %}">
+            <div class="card-body text-center py-3">
+                <span class="badge bg-info text-white mb-2">60 Days</span>
+                <h3 class="fw-bold text-info mb-0">{{ counts.days_60 }}</h3>
+                <small class="text-muted">Expiring in 31-60 Days</small>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <a href="{{ url_for('inventory.expiry', range='90') }}" class="card border-0 shadow-sm text-decoration-none rounded-4 {% if selected_range == '90' %}border border-2 border-secondary{% endif %}">
+            <div class="card-body text-center py-3">
+                <span class="badge bg-secondary mb-2">90 Days</span>
+                <h3 class="fw-bold text-secondary mb-0">{{ counts.days_90 }}</h3>
+                <small class="text-muted">Expiring in 61-90 Days</small>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Batches Table -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header bg-white py-3 border-0">
+        <h5 class="fw-bold mb-0">
+            {% if selected_range == 'expired' %}
+                <i class="fas fa-times-circle text-danger me-2"></i> Expired Medicine Batches
+            {% else %}
+                <i class="fas fa-clock text-warning me-2"></i> Batches Expiring Within {{ selected_range }} Days
+            {% endif %}
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Batch No</th>
+                        <th>Medicine Name</th>
+                        <th>Category</th>
+                        <th>Supplier</th>
+                        <th>Expiry Date</th>
+                        <th>Remaining Stock</th>
+                        <th>Selling Price</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td class="fw-bold text-primary">{{ item.batch_no }}</td>
+                        <td>
+                            <div class="fw-bold">{{ item.medicine_name }}</div>
+                            <small class="text-muted">{{ item.generic_name or '' }}</small>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">{{ item.category_name or 'Uncategorized' }}</span></td>
+                        <td>{{ item.supplier_name or '-' }}</td>
+                        <td class="fw-bold {% if selected_range == 'expired' %}text-danger{% else %}text-warning{% endif %}">
+                            {{ item.expiry_date }}
+                        </td>
+                        <td><span class="badge bg-dark fs-6">{{ item.remaining_quantity }} {{ item.unit }}s</span></td>
+                        <td>₹{{ "%.2f"|format(item.selling_price) }}</td>
+                        <td class="text-end">
+                            <a href="{{ url_for('return.new') }}" class="btn btn-sm btn-outline-danger" title="Return to Supplier">
+                                <i class="fas fa-undo-alt me-1"></i> Return
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            <i class="fas fa-check-circle text-success me-1"></i> No medicine batches found in this expiry range.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

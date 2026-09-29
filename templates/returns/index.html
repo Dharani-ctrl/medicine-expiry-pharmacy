@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Purchase Returns - Pharmacy System{% endblock %}
+
+{% block content %}
+<div class="section-toolbar d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Purchase Returns</h3>
+        <p class="text-muted mb-0">Track damaged, defective, or expired medicines returned to suppliers.</p>
+    </div>
+    <a href="{{ url_for('return.new') }}" class="section-toolbar-button btn btn-primary fw-bold rounded-pill px-3 shadow-sm">
+        <i class="fas fa-plus me-1"></i> Add Purchase Return
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Return No</th>
+                        <th>Supplier</th>
+                        <th>Medicine</th>
+                        <th>Batch No</th>
+                        <th>Qty Returned</th>
+                        <th>Refund Amount</th>
+                        <th>Reason</th>
+                        <th>Return Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in returns %}
+                    <tr>
+                        <td class="fw-bold text-primary">{{ r.return_no }}</td>
+                        <td class="fw-bold text-dark">{{ r.supplier_name }}</td>
+                        <td>{{ r.medicine_name }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ r.batch_no }}</span></td>
+                        <td class="fw-bold text-danger">{{ r.return_quantity }} units</td>
+                        <td class="fw-bold text-success">₹{{ "%.2f"|format(r.refund_amount) }}</td>
+                        <td class="small text-muted" style="max-width: 200px;">{{ r.reason or '-' }}</td>
+                        <td class="small text-muted">{{ r.return_date }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">No purchase returns recorded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

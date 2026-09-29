@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Pharmacy Settings - Pharmacy System{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Pharmacy Business Settings</h3>
+    <p class="text-muted mb-0">Configure pharmacy header details, tax numbers, and invoice footer messages.</p>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 col-lg-8">
+    <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('admin.settings') }}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Pharmacy Store Name</label>
+                    <input type="text" class="form-control" name="pharmacy_name" value="{{ settings.pharmacy_name or 'CurePlus Pharmacy' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Tax Registration / GST No</label>
+                    <input type="text" class="form-control" name="tax_no" value="{{ settings.tax_no or '' }}">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Phone Number</label>
+                    <input type="text" class="form-control" name="phone" value="{{ settings.phone or '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Email Address</label>
+                    <input type="email" class="form-control" name="email" value="{{ settings.email or '' }}">
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-bold">Store Address</label>
+                    <textarea class="form-control" name="address" rows="2">{{ settings.address or '' }}</textarea>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Currency Symbol</label>
+                    <input type="text" class="form-control" name="currency_symbol" value="{{ settings.currency_symbol or '₹' }}">
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-bold">Invoice Receipt Footer Note</label>
+                    <input type="text" class="form-control" name="receipt_footer" value="{{ settings.receipt_footer or '' }}" placeholder="Thank you for choosing our pharmacy! Get well soon.">
+                </div>
+
+                <div class="col-12 mt-4">
+                    <button type="submit" class="btn btn-primary fw-bold px-4 py-2">
+                        <i class="fas fa-save me-1"></i> Save Pharmacy Settings
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

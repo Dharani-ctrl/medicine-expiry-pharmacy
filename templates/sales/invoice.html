@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Invoice #{{ sale.invoice_no }}{% endblock %}
+
+{% block content %}
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <div>
+        <a href="{{ url_for('sales.history') }}" class="text-decoration-none text-muted">
+            <i class="fas fa-arrow-left me-1"></i> Back to Sales History
+        </a>
+        <h3 class="fw-bold mt-2">Customer Invoice: <span class="text-primary">{{ sale.invoice_no }}</span></h3>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('sales.pos') }}" class="btn btn-outline-primary fw-bold rounded-pill">
+            <i class="fas fa-plus me-1"></i> New Sale
+        </a>
+        <button onclick="window.print()" class="btn btn-success fw-bold rounded-pill px-3 shadow-sm">
+            <i class="fas fa-print me-1"></i> Print Invoice
+        </button>
+    </div>
+</div>
+
+<div class="card border-0 shadow-lg rounded-4 overflow-hidden col-lg-9 mx-auto" id="invoice-print-area">
+    <div class="card-body p-5">
+        <!-- Header / Pharmacy Info -->
+        <div class="row border-bottom pb-4 mb-4">
+            <div class="col-7">
+                <h3 class="fw-bold text-primary mb-1"><i class="fas fa-clinic-medical me-2"></i>{{ settings.pharmacy_name or 'CurePlus Pharmacy' }}</h3>
+                <p class="text-muted small mb-0">{{ settings.address or 'Medical District' }}</p>
+                <p class="text-muted small mb-0">Phone: {{ settings.phone or '' }} | Email: {{ settings.email or '' }}</p>
+                {% if settings.tax_no %}
+                <p class="text-muted small mb-0">Tax Reg No: <strong>{{ settings.tax_no }}</strong></p>
+                {% endif %}
+            </div>
+            <div class="col-5 text-end">
+                <h4 class="fw-bold text-dark mb-1">INVOICE</h4>
+                <p class="mb-1 text-primary fw-bold fs-5">#{{ sale.invoice_no }}</p>
+                <p class="text-muted small mb-0">Date: {{ sale.sale_date }}</p>
+                <p class="text-muted small mb-0">Payment: <strong>{{ sale.payment_method }}</strong></p>
+            </div>
+        </div>
+
+        <!-- Customer Info -->
+        <div class="row mb-4">
+            <div class="col-12 bg-light p-3 rounded-3">
+                <span class="text-muted small text-uppercase fw-bold">Customer Details:</span>
+                <div class="fw-bold text-dark fs-6">{{ sale.customer_name }}</div>
+                {% if sale.customer_phone %}
+                <small class="text-muted">Contact: {{ sale.customer_phone }}</small>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Invoice Items Table -->
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 5%;">#</th>
+                        <th>Medicine Description</th>
+                        <th>Batch No</th>
+                        <th>Expiry</th>
+                        <th class="text-center" style="width: 10%;">Qty</th>
+                        <th class="text-end" style="width: 15%;">Unit Price</th>
+                        <th class="text-end" style="width: 15%;">Total Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <div class="fw-bold">{{ item.medicine_name }}</div>
+                            <small class="text-muted">{{ item.generic_name or '' }}</small>
+                        </td>
+                        <td class="fw-bold text-primary">{{ item.batch_no }}</td>
+                        <td class="small text-muted">{{ item.expiry_date }}</td>
+                        <td class="text-center fw-bold">{{ item.quantity }}</td>
+                        <td class="text-end">₹{{ "%.2f"|format(item.unit_price) }}</td>
+                        <td class="text-end fw-bold">₹{{ "%.2f"|format(item.total_price) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Math Breakdown -->
+        <div class="row">
+            <div class="col-6">
+                <p class="text-muted small mt-3">{{ settings.receipt_footer or 'Thank you for your business!' }}</p>
+            </div>
+            <div class="col-6">
+                <div class="bg-light p-3 rounded-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Subtotal:</span>
+                        <span class="fw-bold">₹{{ "%.2f"|format(sale.subtotal) }}</span>
+                    </div>
+                    {% if sale.tax_amount > 0 %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Tax / VAT:</span>
+                        <span>+₹{{ "%.2f"|format(sale.tax_amount) }}</span>
+                    </div>
+                    {% endif %}
+                    {% if sale.discount_amount > 0 %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Discount:</span>
+                        <span class="text-danger">-₹{{ "%.2f"|format(sale.discount_amount) }}</span>
+                    </div>
+                    {% endif %}
+                    {% set round_value = sale.grand_total - sale.subtotal - sale.tax_amount + sale.discount_amount %}
+                    {% if round_value != 0 %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Round Value:</span>
+                        <span>{% if round_value > 0 %}+{% else %}-{% endif %}₹{{ "%.2f"|format(round_value|abs) }}</span>
+                    </div>
+                    {% endif %}
+                    <hr class="my-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold fs-5">Grand Total:</span>
+                        <span class="fw-bold fs-4 text-success">₹{{ "%.0f"|format(sale.grand_total) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

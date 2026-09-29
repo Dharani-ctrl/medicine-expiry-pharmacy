@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Login - Pharmacy Management System{% endblock %}
+
+{% block auth_content %}
+<div class="row justify-content-center align-items-center style="min-height: 80vh;"">
+    <div class="col-md-5 col-lg-4">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-primary text-white text-center py-4">
+                <i class="fas fa-prescription-bottle-alt fa-3x mb-2"></i>
+                <h4 class="fw-bold mb-0">Pharmacy Admin</h4>
+                <p class="small text-white-50 mb-0">Medicine Expiry & Inventory System</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('auth.login') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-bold">Admin Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fas fa-user text-muted"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter admin username" required autofocus>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label fw-bold">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fas fa-lock text-muted"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold rounded-3">
+                        <i class="fas fa-sign-in-alt me-2"></i> Log In to Dashboard
+                    </button>
+                </form>
+            </div>
+            <div class="card-footer bg-light text-center py-3 text-muted small">
+                Default Credentials: <strong>admin</strong> / <strong>admin123</strong>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+<div id="sidebar-wrapper" class="d-none d-md-block">
+    <div class="sidebar-brand d-flex align-items-center gap-2">
+        <i class="fas fa-pills text-primary fs-3"></i>
+        <span>CurePlus Pharmacy</span>
+    </div>
+
+    <div class="sidebar-heading">Core</div>
+    <div class="sidebar-menu">
+        <a href="{{ url_for('dashboard.index') }}" class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
+            <i class="fas fa-chart-line"></i> Dashboard
+        </a>
+    </div>
+
+    <div class="sidebar-heading">Pharmacy Operations</div>
+    <div class="sidebar-menu">
+        <a href="{{ url_for('sales.pos') }}" class="nav-link {% if request.endpoint == 'sales.pos' %}active{% endif %}">
+            <i class="fas fa-cash-register"></i> POS & Billing
+        </a>
+        <a href="{{ url_for('sales.history') }}" class="nav-link {% if request.endpoint == 'sales.history' %}active{% endif %}">
+            <i class="fas fa-file-invoice-dollar"></i> Sales History
+        </a>
+        <a href="{{ url_for('medicine.index') }}" class="nav-link {% if 'medicine' in request.endpoint %}active{% endif %}">
+            <i class="fas fa-capsules"></i> Medicines
+        </a>
+        <a href="{{ url_for('category.index') }}" class="nav-link {% if 'category' in request.endpoint %}active{% endif %}">
+            <i class="fas fa-tags"></i> Categories
+        </a>
+        <a href="{{ url_for('supplier.index') }}" class="nav-link {% if 'supplier' in request.endpoint %}active{% endif %}">
+            <i class="fas fa-truck-loading"></i> Suppliers
+        </a>
+        <a href="{{ url_for('purchase.index') }}" class="nav-link {% if 'purchase' in request.endpoint %}active{% endif %}">
+            <i class="fas fa-shopping-cart"></i> Purchases
+        </a>
+    </div>
+
+    <div class="sidebar-heading">Stock & Expiry</div>
+    <div class="sidebar-menu">
+        <a href="{{ url_for('inventory.index') }}" class="nav-link {% if request.endpoint == 'inventory.index' %}active{% endif %}">
+            <i class="fas fa-boxes"></i> Inventory Stock
+        </a>
+        <a href="{{ url_for('inventory.expiry') }}" class="nav-link {% if request.endpoint == 'inventory.expiry' %}active{% endif %}">
+            <i class="fas fa-calendar-times text-warning"></i> Expiry Monitor
+        </a>
+        <a href="{{ url_for('inventory.low_stock') }}" class="nav-link {% if request.endpoint == 'inventory.low_stock' %}active{% endif %}">
+            <i class="fas fa-exclamation-triangle text-danger"></i> Low Stock Alert
+        </a>
+        <a href="{{ url_for('return.index') }}" class="nav-link {% if 'return' in request.endpoint %}active{% endif %}">
+            <i class="fas fa-undo-alt"></i> Purchase Returns
+        </a>
+    </div>
+
+    <div class="sidebar-heading">Analytics & Settings</div>
+    <div class="sidebar-menu">
+        <a href="{{ url_for('report.sales') }}" class="nav-link {% if 'report' in request.endpoint %}active{% endif %}">
+            <i class="fas fa-chart-pie"></i> Reports
+        </a>
+        <a href="{{ url_for('admin.profile') }}" class="nav-link {% if request.endpoint == 'admin.profile' %}active{% endif %}">
+            <i class="fas fa-user-shield"></i> Admin Profile
+        </a>
+        <a href="{{ url_for('admin.settings') }}" class="nav-link {% if request.endpoint == 'admin.settings' %}active{% endif %}">
+            <i class="fas fa-sliders-h"></i> Pharmacy Settings
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="nav-link text-danger mt-3">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</div>

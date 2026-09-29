@@ -1,0 +1,43 @@
+<nav class="navbar navbar-expand-lg main-navbar">
+    <div class="container-fluid">
+        <button class="btn btn-sm btn-outline-secondary d-md-none me-2" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <span class="navbar-brand fw-bold text-dark fs-6 d-none d-sm-inline">
+            <i class="fas fa-clinic-medical text-primary me-2"></i>Pharmacy Admin Dashboard
+        </span>
+
+        <div class="ms-auto d-flex align-items-center gap-3">
+            <a href="{{ url_for('sales.pos') }}" class="btn btn-primary btn-sm px-3 rounded-pill fw-bold shadow-sm navbar-pos-link">
+                <i class="fas fa-cash-register me-1"></i> <span class="d-none d-sm-inline">POS Billing</span>
+            </a>
+
+            <!-- Quick Expiry Alert Badge -->
+            <a href="{{ url_for('inventory.expiry') }}"
+                class="btn btn-sm btn-outline-danger position-relative rounded-circle p-2" title="Expiry Alerts">
+                <i class="fas fa-bell"></i>
+            </a>
+
+            <!-- Admin Profile Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light dropdown-toggle border rounded-pill px-3 fw-bold" type="button"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-shield text-primary me-1"></i> <span class="d-none d-sm-inline">{{ session.get('admin_username', 'Admin') }}</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                    <li><a class="dropdown-item" href="{{ url_for('admin.profile') }}"><i
+                                class="fas fa-user-circle me-2 text-muted"></i> View Profile</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('admin.change_password') }}"><i
+                                class="fas fa-key me-2 text-muted"></i> Change Password</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('admin.settings') }}"><i
+                                class="fas fa-cog me-2 text-muted"></i> System Settings</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i
+                                class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>

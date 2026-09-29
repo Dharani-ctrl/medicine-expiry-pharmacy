@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Low Stock Alert - Pharmacy System{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('inventory.index') }}" class="text-decoration-none text-muted">
+        <i class="fas fa-arrow-left me-1"></i> Back to Inventory
+    </a>
+    <h3 class="fw-bold mt-2 text-danger"><i class="fas fa-exclamation-triangle me-2"></i> Low Stock & Out of Stock Alerts</h3>
+    <p class="text-muted mb-0">Medicines running below their designated minimum re-order threshold.</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white py-3 border-0">
+                <h5 class="fw-bold text-danger mb-0"><i class="fas fa-box-open me-2"></i> Out of Stock Medicines (0 Stock)</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Medicine</th>
+                                <th>Category</th>
+                                <th>Supplier</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in out_of_stock %}
+                            <tr>
+                                <td class="fw-bold">{{ m.name }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ m.category_name }}</span></td>
+                                <td class="small">{{ m.supplier_name or 'N/A' }}</td>
+                                <td>
+                                    <a href="{{ url_for('purchase.new') }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-cart-plus me-1"></i> Order Stock
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-3 text-muted"><i class="fas fa-check-circle text-success me-1"></i> No out-of-stock medicines.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white py-3 border-0">
+                <h5 class="fw-bold text-warning mb-0"><i class="fas fa-exclamation-circle me-2"></i> Low Stock Warning</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Medicine</th>
+                                <th>Current Stock</th>
+                                <th>Min Threshold</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in low_stock %}
+                            <tr>
+                                <td class="fw-bold">{{ m.name }}</td>
+                                <td><span class="badge bg-warning text-dark fs-6">{{ m.current_stock }} {{ m.unit }}s</span></td>
+                                <td><span class="small text-muted">{{ m.min_stock_level }} {{ m.unit }}s</span></td>
+                                <td>
+                                    <a href="{{ url_for('purchase.new') }}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-plus me-1"></i> Restock
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-3 text-muted"><i class="fas fa-check-circle text-success me-1"></i> All stock levels are sufficient.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

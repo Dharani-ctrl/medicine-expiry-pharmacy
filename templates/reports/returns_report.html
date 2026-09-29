@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Purchase Return Report - Pharmacy System{% endblock %}
+
+{% block content %}
+<div class="section-toolbar d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Purchase Return Report</h3>
+        <p class="text-muted mb-0">Track returned stock items and vendor refunds.</p>
+    </div>
+    <a href="{{ url_for('report.returns', start_date=start_date, end_date=end_date, export='csv') }}" class="btn btn-outline-success fw-bold rounded-pill">
+        <i class="fas fa-file-csv me-1"></i> Export CSV
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('report.returns') }}" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-bold small text-muted">Start Date</label>
+                <input type="date" class="form-control" name="start_date" value="{{ start_date }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold small text-muted">End Date</label>
+                <input type="date" class="form-control" name="end_date" value="{{ end_date }}">
+            </div>
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary fw-bold w-100">Filter</button>
+                <a href="{{ url_for('report.returns') }}" class="btn btn-outline-secondary"><i class="fas fa-undo"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card card-stat bg-white">
+            <div class="card-body">
+                <span class="text-muted small fw-bold text-uppercase">Total Refund Amount</span>
+                <h3 class="fw-bold text-success mb-0">₹{{ "%.2f"|format(data.total_refund) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-stat bg-white">
+            <div class="card-body">
+                <span class="text-muted small fw-bold text-uppercase">Total Return Logs</span>
+                <h3 class="fw-bold text-primary mb-0">{{ data.total_count }} Returns</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Return No</th>
+                        <th>Supplier</th>
+                        <th>Medicine</th>
+                        <th>Batch No</th>
+                        <th>Qty Returned</th>
+                        <th>Refund Amount</th>
+                        <th>Reason</th>
+                        <th>Return Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in data.returns %}
+                    <tr>
+                        <td class="fw-bold text-primary">{{ r.return_no }}</td>
+                        <td class="fw-bold">{{ r.supplier_name }}</td>
+                        <td>{{ r.medicine_name }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ r.batch_no }}</span></td>
+                        <td class="fw-bold text-danger">{{ r.return_quantity }} units</td>
+                        <td class="fw-bold text-success">₹{{ "%.2f"|format(r.refund_amount) }}</td>
+                        <td class="small text-muted">{{ r.reason or '-' }}</td>
+                        <td class="small text-muted">{{ r.return_date }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">No purchase returns recorded.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

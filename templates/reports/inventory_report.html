@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Inventory Report - Pharmacy System{% endblock %}
+
+{% block content %}
+<div class="section-toolbar d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Inventory Valuation Report</h3>
+        <p class="text-muted mb-0">Complete audit of available medicine stock levels and valuation.</p>
+    </div>
+    <a href="{{ url_for('report.inventory', export='csv') }}" class="btn btn-outline-success fw-bold rounded-pill">
+        <i class="fas fa-file-csv me-1"></i> Export CSV
+    </a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card card-stat bg-white">
+            <div class="card-body">
+                <span class="text-muted small fw-bold text-uppercase">Total Cost Value</span>
+                <h3 class="fw-bold text-primary mb-0">₹{{ "%.2f"|format(valuation.total_cost_value or 0) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-stat bg-white">
+            <div class="card-body">
+                <span class="text-muted small fw-bold text-uppercase">Total Retail Selling Value</span>
+                <h3 class="fw-bold text-success mb-0">₹{{ "%.2f"|format(valuation.total_selling_value or 0) }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Medicine</th>
+                        <th>Generic Name</th>
+                        <th>Category</th>
+                        <th>Supplier</th>
+                        <th>Unit</th>
+                        <th>Min Stock</th>
+                        <th>Current Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in current_stock %}
+                    <tr>
+                        <td class="fw-bold text-dark">{{ m.medicine_name }}</td>
+                        <td class="text-muted">{{ m.generic_name or '-' }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ m.category_name or '-' }}</span></td>
+                        <td>{{ m.supplier_name or '-' }}</td>
+                        <td>{{ m.unit }}</td>
+                        <td>{{ m.min_stock_level }}</td>
+                        <td class="fw-bold fs-6 {% if m.total_quantity <= m.min_stock_level %}text-danger{% else %}text-success{% endif %}">
+                            {{ m.total_quantity }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No inventory data.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

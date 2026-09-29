@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Medicine Management - Pharmacy System{% endblock %}
+
+{% block content %}
+<div class="section-toolbar d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Medicine Management</h3>
+        <p class="text-muted mb-0">Add, edit, search, and monitor medicines inventory.</p>
+    </div>
+    <a href="{{ url_for('medicine.add') }}" class="section-toolbar-button btn btn-primary fw-bold rounded-pill px-3 shadow-sm">
+        <i class="fas fa-plus me-1"></i> Add New Medicine
+    </a>
+</div>
+
+<!-- Search & Filter Card -->
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('medicine.index') }}" class="row g-3">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" class="form-control" name="q" placeholder="Search by medicine or generic name..." value="{{ search_q }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="category_id">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if selected_cat == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" name="status">
+                    <option value="">All Statuses</option>
+                    <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-secondary w-100 fw-bold">Filter</button>
+                <a href="{{ url_for('medicine.index') }}" class="btn btn-outline-secondary"><i class="fas fa-undo"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Medicines Table -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Medicine Name</th>
+                        <th>Generic Name</th>
+                        <th>Category</th>
+                        <th>Supplier</th>
+                        <th>Available Stock</th>
+                        <th>Min Level</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for med in medicines %}
+                    <tr>
+                        <td class="small text-muted">#{{ med.id }}</td>
+                        <td class="fw-bold">{{ med.name }}</td>
+                        <td class="text-muted">{{ med.generic_name or '-' }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ med.category_name or 'Uncategorized' }}</span></td>
+                        <td>{{ med.supplier_name or '-' }}</td>
+                        <td>
+                            {% if med.total_stock <= med.min_stock_level %}
+                                <span class="badge bg-danger fs-6">{{ med.total_stock }} {{ med.unit }}s</span>
+                            {% else %}
+                                <span class="badge bg-success fs-6">{{ med.total_stock }} {{ med.unit }}s</span>
+                            {% endif %}
+                        </td>
+                        <td class="small text-muted">{{ med.min_stock_level }}</td>
+                        <td>
+                            {% if med.status == 'active' %}
+                                <span class="badge bg-success-subtle text-success border border-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary border">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ url_for('medicine.edit', medicine_id=med.id) }}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="POST" action="{{ url_for('medicine.delete', medicine_id=med.id) }}" class="d-inline" onsubmit="return confirm('Deactivate this medicine?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Deactivate">
+                                    <i class="fas fa-ban"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">No medicines found matching criteria.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
